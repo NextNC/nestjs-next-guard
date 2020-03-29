@@ -7,6 +7,9 @@
 </div>
 
 <h3 align="center">NestJS NextGuard</h3>
+<a href="https://www.npmjs.com/package/@nextnm/nestjs-next-guard"><img src="https://img.shields.io/npm/v/@nextnm/nestjs-next-guard.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/@nextnm/nestjs-next-guard"><img src="https://img.shields.io/npm/l/@nextnm/nestjs-next-guard.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/@nextnm/nestjs-next-guard"><img src="https://img.shields.io/npm/dm/@nextnm/nestjs-next-guard.svg" alt="NPM Downloads" /></a>
 
 <div align="center">
   <a href="https://nestjs.com" target="_blank">
