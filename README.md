@@ -78,10 +78,25 @@ export class YOURModule {}
 
 ### Using decorators
 
+1. Case
+
+```
+User:
+{
+  _id:ObjectId
+}
+
+Site:
+{
+  _id:ObjectId,
+  user:ObjectId
+}
+```
+
 ```typescript
   @CheckOwnerShip({
     requestParam: 'modelId',
-    propertyChain: ['site', 'user'],
+    propertyChain: ['site', 'user'], // The last preoperty will be compared wiht the Id of the user making the request
     modelChain: ['Page','Site'],
     godRole: ExistingRoles.ADMIN,
   })
@@ -89,6 +104,37 @@ export class YOURModule {}
   @UseGuards(NextGuard)
   @Get(':modelId')
   async findById(@Param('id') id: string) {
+    //...
+  }
+```
+
+2. Case
+
+```
+User:
+{
+_id:ObjectId,
+organization:ObjectId
+}
+
+
+Organization:
+{
+  _id:ObjectId
+}
+```
+
+```typescript
+    @CheckOwnerShip({
+    requestParam: 'id',
+    propertyChain: ['_id','organization','_id'], // The last preoperty will be compared wiht the Id of the user making the request
+    modelChain: ['Organization','User'],
+    godRole: ExistingRoles.ADMIN,
+  })
+  @Roles(ExistingRoles.USER, ExistingRoles.ADMIN)
+  @UseGuards(AuthGuard('jwt'),NextGuard)
+  @Get('/:id')
+  findById(@Param() params): Promise<ReadOrganizationDto> {
     //...
   }
 ```
@@ -117,6 +163,7 @@ Contributions welcome!
 ## Author
 
 **Nuno Carvalhão (nextnm/nextNC)**
+
 ## License
 
 Licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
