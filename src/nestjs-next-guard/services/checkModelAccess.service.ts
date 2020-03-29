@@ -6,7 +6,6 @@ import {
 import { Model } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { NEXT_GUARD_MODELS_TOKEN } from '../nextGuard.config';
-import { Reflector, ModuleRef } from '@nestjs/core';
 
 @Injectable()
 export class CheckModelAccessService {
@@ -29,7 +28,7 @@ export class CheckModelAccessService {
     let paramKey = propertyChain.shift();
 
     for (const model of modelChain) {
-      const instance = await (this.getModel(model) as any)
+      let instance = await (this.getModel(model) as any)
         .findById(paramValue)
         .lean();
 
@@ -37,11 +36,11 @@ export class CheckModelAccessService {
         if (propertyChain.length === 0) {
           return false;
         }
-        paramKey = propertyChain.shift();
-        const instance2 = await (this.getModel(model) as any)
+        instance = await (this.getModel(model) as any)
           .findOne({ [paramKey]: mongoose.Types.ObjectId(paramValue) })
           .lean();
-        if (!instance2) {
+
+        if (!instance) {
           return false;
         }
         paramKey = propertyChain.shift();
