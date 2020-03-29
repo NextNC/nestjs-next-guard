@@ -53,7 +53,7 @@ export interface ICheckOwnerShip {
 
 ```typescript
 import * as mongoose from 'mongoose';
-import { NestjsNextGuardModule } from '@nextnm/nestjs-next-guard';
+import { NextGuardModule } from '@nextnm/nestjs-next-guard';
 // Temporary solution to pass connection to the guard
 mongoose.connect('<YOUR_CONNECTION_STRING>')
 
@@ -61,7 +61,7 @@ mongoose.connect('<YOUR_CONNECTION_STRING>')
 @Module({
   imports: [
     DbModule,
-    NestjsNextGuardModule.forRoot({
+    NextGuardModule.forRoot({
       models: [
         { token: 'Site', model: mongoose.model('site', SiteSchema)},
         { token: 'Page', model: mongoose.model('page', PageSchema) },

@@ -5,10 +5,10 @@ import { NextGuard } from './guards/roles.guard';
 import { CheckModelAccessService } from './services/checkModelAccess.service';
 
 @Module({})
-export class NestjsNextGuardModule {
+export class NextGuardModule {
   public static forRoot(config: ConfigurationNextGuard) {
     return {
-      module: NestjsNextGuardModule,
+      module: NextGuardModule,
       //   controllers: [
       //     ...controllers,
       //   ],

@@ -4,8 +4,8 @@
 // export * from './nestjs-next-guard/test';
 // export * from './nestjs-next-guard/nestjs-next-guard.module';
 export {
-  NestjsNextGuardModule,
-} from './nestjs-next-guard/nestjs-next-guard.module';
+  NextGuardModule,
+} from './nestjs-next-guard/next-guard.module';
 export { NEXT_GUARD_MODELS_TOKEN } from './nestjs-next-guard/nextGuard.config';
 export { CheckOwnerShip  } from './nestjs-next-guard/decorators/check-ownership.decorator';
 export { Roles  } from './nestjs-next-guard/decorators/roles.decorator';
