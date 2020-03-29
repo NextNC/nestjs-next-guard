@@ -12,10 +12,8 @@ import { Reflector, ModuleRef } from '@nestjs/core';
 export class CheckModelAccessService {
   private modelsMap = new Map<string, Model<any>>();
   constructor(
-    private moduleRef: ModuleRef,
     @Inject(NEXT_GUARD_MODELS_TOKEN)
     private readonly models: Array<{ model: Model<any>; token: string }>,
-    private readonly reflector: Reflector,
   ) {
     this.models.forEach(config => {
       this.modelsMap.set(config.token, config.model);
@@ -29,16 +27,29 @@ export class CheckModelAccessService {
     propertyChain: string[] = [], // ['userId']
   ) {
     let paramKey = propertyChain.shift();
+
     for (const model of modelChain) {
       const instance = await (this.getModel(model) as any)
         .findById(paramValue)
         .lean();
+
       if (!instance) {
-        return false;
-      }
-      paramValue = instance[paramKey];
-      if (!paramValue) {
-        return false;
+        if (propertyChain.length === 0) {
+          return false;
+        }
+        paramKey = propertyChain.shift();
+        const instance2 = await (this.getModel(model) as any)
+          .findOne({ [paramKey]: mongoose.Types.ObjectId(paramValue) })
+          .lean();
+        if (!instance2) {
+          return false;
+        }
+        paramKey = propertyChain.shift();
+      } else {
+        paramValue = instance[paramKey];
+        if (!paramValue) {
+          return false;
+        }
       }
 
       if (propertyChain.length > 0) {
@@ -54,7 +65,7 @@ export class CheckModelAccessService {
       return model;
     } else {
       throw new InternalServerErrorException(
-        'Model decalaration missing in check model access',
+        `Model (${key}) decalaration missing in check model access`,
       );
     }
   }

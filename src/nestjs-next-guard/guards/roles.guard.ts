@@ -16,7 +16,6 @@ export class NextGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-
     let resultOwnerShip = true;
     let roles = this.reflector.get<string[]>('roles', context.getHandler());
     const checkOwnerShip: ICheckOwnerShip = this.reflector.get<ICheckOwnerShip>(
@@ -43,21 +42,23 @@ export class NextGuard implements CanActivate {
       );
     }
 
-    const param =
-      request.params[checkOwnerShip.requestParam] ||
-      request.body[checkOwnerShip.requestParam];
+    if (checkOwnerShip) {
+      const param =
+        request.params[checkOwnerShip.requestParam] ||
+        request.body[checkOwnerShip.requestParam];
 
-    if (
-      checkOwnerShip &&
-      ((checkOwnerShip as any).godRole &&
-        user.roles.indexOf((checkOwnerShip as any).godRole) === -1)
-    ) {
-      resultOwnerShip = await this.checkModelAccessService.checkAccess(
-        param,
-        [...checkOwnerShip.modelChain],
-        user._id,
-        [...checkOwnerShip.propertyChain],
-      );
+      if (
+        checkOwnerShip &&
+        (checkOwnerShip.godRole &&
+          user.roles.indexOf(checkOwnerShip.godRole) === -1)
+      ) {
+        resultOwnerShip = await this.checkModelAccessService.checkAccess(
+          param,
+          [...checkOwnerShip.modelChain],
+          user._id,
+          [...checkOwnerShip.propertyChain],
+        );
+      }
     }
 
     const hasRole = () => user.roles.some(role => roles.includes(role));
