@@ -1,6 +1,6 @@
 {
   "name": "@nextnm/nestjs-next-guard",
-  "version": "0.0.1-beta-3",
+  "version": "0.0.1-beta-4",
   "description": "NestJS RBAC Guard that also checks models ownership",
   "author": "Nuno Carvalhão <nuno.carvalhao@gmail.com>",
   "license": "MIT",
