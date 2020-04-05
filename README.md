@@ -23,7 +23,7 @@ This is simple guard wich can protect your routes by Role (RBAC) and also as the
 
 ## Example
 
-As an example consider that you are a user belonging to an organization which has some books associated. Now if you request a book by id this guard will check if the book that you are trying to fetch belongs to the organization that you are associated and so on you only need pass the models chain as awell as the property chain.
+As an example consider that you are a user belonging to an organization which has some books associated. Now if you request a book by id this guard will check if the book that you are trying to fetch belongs to the organization that you are associated and so on. You only need to pass the models chain as awell as the property chain.
 
 ## Installation
 
@@ -35,10 +35,10 @@ npm i @nextnm/nestjs-next-guard
 
 ## Usage
 
-## Caveats
+### Caveats
 
 1. You must be sure that in every request that the guard is used there is a user property in the request with an array of roles.
-2. It will only comtemplates situations where you a have an id as resquest param (GET ("/:id")) or in the body (PUT udapdting object {\_id:"...", "property1":....})
+2. It will only comtemplates situations where you a have an id as request param (GET ("/:id")) or in the body (PUT updating object {\_id:"...", "property1":....})
    <!-- 1. npm i @nextnm/nestjs-next-guard -->
 
 ### Interface Decorator
@@ -99,11 +99,11 @@ Site:
 ```typescript
   @CheckOwnerShip({
     requestParam: 'modelId',
-    propertyChain: ['site', 'user'], // The last preoperty will be compared wiht the Id of the user making the request
+    propertyChain: ['site', 'user'], // The last property will be compared wiht the Id of the user making the request
     modelChain: ['Page','Site'],
-    godRole: ExistingRoles.ADMIN,
+    godRole: ExistingRoles.SYS_ADMIN, // If the user has this role not check will be done by the guard
   })
-  @Roles(ExistingRoles.USER, ExistingRoles.ADMIN)
+  @Roles(ExistingRoles.USER, ExistingRoles.ADMIN) // Provide the roles that you allow to execute this method,example: 'USER', 'ADMIN'
   @UseGuards(NextGuard)
   @Get(':modelId')
   async findById(@Param('id') id: string) {
@@ -130,11 +130,11 @@ Organization:
 ```typescript
     @CheckOwnerShip({
     requestParam: 'id',
-    propertyChain: ['_id','organization','_id'], // The last preoperty will be compared wiht the Id of the user making the request
+    propertyChain: ['_id','organization','_id'], // The last property will be compared wiht the Id of the user making the request
     modelChain: ['Organization','User'],
-    godRole: ExistingRoles.ADMIN,
+    godRole: ExistingRoles.SYS_ADMIN, // If the user has this role not check will be done by the guard
   })
-  @Roles(ExistingRoles.USER, ExistingRoles.ADMIN)
+  @Roles(ExistingRoles.USER, ExistingRoles.ADMIN) // Provide the roles that you allow to execute this method,example: 'USER', 'ADMIN'
   @UseGuards(AuthGuard('jwt'),NextGuard)
   @Get('/:id')
   findById(@Param() params): Promise<ReadOrganizationDto> {
@@ -157,7 +157,7 @@ Contributions welcome!
 ## Next steps
 
 1. Add some tests using Jest and supertest
-2. Find a way to pass Mongoose Models to the module, to void calling "mongoose.connect(...)"
+2. Find a way to pass Mongoose Models to the module, to avoid calling "mongoose.connect(...)"
 3. Add support do many to many relatioships betwenn models
 4. Build Policy Based Guard
 
