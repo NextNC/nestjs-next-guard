@@ -104,9 +104,9 @@ Page:
 }
 ```
 ##### Description (A user belongs to an organization)
-1 - The guard will look for an "Page" (modelChain[0]) by id equals to the request param;
-2 - From the found Page it will try to grab the property 'site' (propertyChain[0]) and find a Site (modelChain[1]) by id equal to that property (propertyChain[0]).
-4 - From the Site found it will check if the property "user" matches the id of the user making the request.
+1. The guard will look for an "Page" (modelChain[0]) by id equals to the request param;
+2. From the found Page it will try to grab the property 'site' (propertyChain[0]) and find a Site (modelChain[1]) by id equal to that property (propertyChain[0]).
+3. From the Site found it will check if the property "user" matches the id of the user making the request.
 ```typescript
   @CheckOwnerShip({
     requestParam: 'modelId',
@@ -139,10 +139,10 @@ Organization:
 ```
 
 ##### Description (A user belongs to an organization)
-1 - The guard will look for an Organization (modelChain[0]) by id equals to the request param;
-2 - From the found Organization it will try to grab the property '_id' (propertyChain[0]) and find a User (modelChain[1]) by id equal to the that property (propertyChain[0]).
-3 - Since there isn't any, it will try to find a User with a property "organization" (propertyChain[1]) equals to the organization "_id" property(propertyChain[0])
-4 - From the User found it will check if the property "_id" matches the id of the user making the request.
+1. The guard will look for an Organization (modelChain[0]) by id equals to the request param;
+2. From the found Organization it will try to grab the property '_id' (propertyChain[0]) and find a User (modelChain[1]) by id equal to the that property (propertyChain[0]).
+3. Since there isn't any, it will try to find a User with a property "organization" (propertyChain[1]) equals to the organization "_id" property(propertyChain[0])
+4. From the User found it will check if the property "_id" matches the id of the user making the request.
 ```typescript
     @CheckOwnerShip({
     requestParam: 'id',
