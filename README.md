@@ -19,11 +19,11 @@
 
 ## Introduction
 
-This is simple guard wich can protect your routes by Role (RBAC) and also as the ability to check the ownership chain of the requested entity.
+This is simple guard which can protect your routes by Role (RBAC) and also has the ability to check the ownership chain of the requested entity.
 
 ## Example
 
-As an example consider that you are a user belonging to an organization which has some books associated. Now if you request a book by id this guard will check if the book that you are trying to fetch belongs to the organization that you are associated and so on. You only need to pass the models chain as awell as the property chain.
+As an example consider that you are a user belonging to an organization which has some books associated. Now, if you request a book by id this guard will check if the book that you are trying to fetch belongs to the organization that you are associated and so on. You only need to pass the models chain as well as the property chain.
 
 ## Installation
 
@@ -81,7 +81,9 @@ export class YOURModule {}
 
 ### Using decorators
 
-1. Case
+Be aware that both decorators are optional so use them as you want.
+
+#### 1. Use Case
 
 ```
 User:
@@ -94,8 +96,17 @@ Site:
   _id:ObjectId,
   user:ObjectId
 }
-```
 
+Page:
+{
+  _id:ObjectId,
+  site:ObjectId
+}
+```
+##### Description (A user belongs to an organization)
+1 - The guard will look for an "Page" (modelChain[0]) by id equals to the request param;
+2 - From the found Page it will try to grab the property 'site' (propertyChain[0]) and find a Site (modelChain[1]) by id equal to that property (propertyChain[0]).
+4 - From the Site found it will check if the property "user" matches the id of the user making the request.
 ```typescript
   @CheckOwnerShip({
     requestParam: 'modelId',
@@ -106,12 +117,12 @@ Site:
   @Roles(ExistingRoles.USER, ExistingRoles.ADMIN) // Provide the roles that you allow to execute this method,example: 'USER', 'ADMIN'
   @UseGuards(NextGuard)
   @Get(':modelId')
-  async findById(@Param('id') id: string) {
+  async findPageById(@Param('id') id: string) {
     //...
   }
 ```
 
-2. Case
+#### 2. Use case
 
 ```
 User:
@@ -127,6 +138,11 @@ Organization:
 }
 ```
 
+##### Description (A user belongs to an organization)
+1 - The guard will look for an Organization (modelChain[0]) by id equals to the request param;
+2 - From the found Organization it will try to grab the property '_id' (propertyChain[0]) and find a User (modelChain[1]) by id equal to the that property (propertyChain[0]).
+3 - Since there isn't any, it will try to find a User with a property "organization" (propertyChain[1]) equals to the organization "_id" property(propertyChain[0])
+4 - From the User found it will check if the property "_id" matches the id of the user making the request.
 ```typescript
     @CheckOwnerShip({
     requestParam: 'id',
@@ -137,7 +153,7 @@ Organization:
   @Roles(ExistingRoles.USER, ExistingRoles.ADMIN) // Provide the roles that you allow to execute this method,example: 'USER', 'ADMIN'
   @UseGuards(AuthGuard('jwt'),NextGuard)
   @Get('/:id')
-  findById(@Param() params): Promise<ReadOrganizationDto> {
+  findOrganizationById(@Param() params): Promise<ReadOrganizationDto> {
     //...
   }
 ```
@@ -152,13 +168,13 @@ See [Changelog](CHANGELOG.md) for more information. -->
 
 ## Contributing
 
-Contributions welcome!
+Contributions are welcome! See [Contributing](CONTRIBUTING.md).
 
 ## Next steps
 
 1. Add some tests using Jest and supertest
 2. Find a way to pass Mongoose Models to the module, to avoid calling "mongoose.connect(...)"
-3. Add support do many to many relatioships betwenn models
+3. Add support do many to many relatioships between models
 4. Build Policy Based Guard
 
 <!-- See [Contributing](CONTRIBUTING.md). -->
