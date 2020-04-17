@@ -49,8 +49,8 @@ export class NextGuard implements CanActivate {
 
       if (
         checkOwnerShip &&
-        (checkOwnerShip.godRole &&
-          user.roles.indexOf(checkOwnerShip.godRole) === -1)
+        checkOwnerShip.godRole &&
+        user.roles.indexOf(checkOwnerShip.godRole) === -1
       ) {
         resultOwnerShip = await this.checkModelAccessService.checkAccess(
           param,
@@ -61,7 +61,7 @@ export class NextGuard implements CanActivate {
       }
     }
 
-    const hasRole = () => user.roles.some(role => roles.includes(role));
+    const hasRole = () => user.roles.some((role) => roles.includes(role));
     return (
       user && user.roles && (hasRole() || roles.length === 0) && resultOwnerShip
     );

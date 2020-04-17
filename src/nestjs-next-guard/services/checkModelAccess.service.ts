@@ -1,23 +1,11 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Inject,
-} from '@nestjs/common';
-import { Model } from 'mongoose';
-import * as mongoose from 'mongoose';
-import { NEXT_GUARD_MODELS_TOKEN } from '../nextGuard.config';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Types } from 'mongoose';
+import { getModelToken } from '@nestjs/mongoose';
+import { ModuleRef } from '@nestjs/core';
 
 @Injectable()
 export class CheckModelAccessService {
-  private modelsMap = new Map<string, Model<any>>();
-  constructor(
-    @Inject(NEXT_GUARD_MODELS_TOKEN)
-    private readonly models: Array<{ model: Model<any>; token: string }>,
-  ) {
-    this.models.forEach(config => {
-      this.modelsMap.set(config.token, config.model);
-    });
-  }
+  constructor(private moduleRef: ModuleRef) {}
 
   public async checkAccess(
     paramValue: any, // EX: site _id
@@ -37,7 +25,7 @@ export class CheckModelAccessService {
           return false;
         }
         instance = await (this.getModel(model) as any)
-          .findOne({ [paramKey]: mongoose.Types.ObjectId(paramValue) })
+          .findOne({ [paramKey]: Types.ObjectId(paramValue) })
           .lean();
 
         if (!instance) {
@@ -54,17 +42,25 @@ export class CheckModelAccessService {
       if (propertyChain.length > 0) {
         paramKey = propertyChain.shift();
       } else {
-        return mongoose.Types.ObjectId(checkValue).equals(instance[paramKey]);
+        return Types.ObjectId(checkValue).equals(instance[paramKey]);
       }
     }
   }
   getModel(key: string) {
-    const model = this.modelsMap.get(key);
-    if (model) {
-      return model;
-    } else {
+    try {
+      const model = this.moduleRef.get(getModelToken(key), {
+        strict: false,
+      });
+      if (model) {
+        return model;
+      } else {
+        throw new InternalServerErrorException(
+          `Model (${key}) decalaration missing in the NextGuardModule context, please make sure you have this Model provided in the dependency injection pool`,
+        );
+      }
+    } catch (error) {
       throw new InternalServerErrorException(
-        `Model (${key}) decalaration missing in check model access`,
+        `Model (${key}) decalaration missing in the NextGuardModule context, please make sure you have this Model provided in the dependency injection pool`,
       );
     }
   }

@@ -6,25 +6,14 @@ import { CheckModelAccessService } from './services/checkModelAccess.service';
 
 @Module({})
 export class NextGuardModule {
-  public static forRoot(config: ConfigurationNextGuard) {
+  public static forRoot() {
     return {
       module: NextGuardModule,
       //   controllers: [
       //     ...controllers,
       //   ],
-      providers: [
-        { provide: NEXT_GUARD_MODELS_TOKEN, useValue: config.models },
-        NextGuard,
-        CheckModelAccessService,
-      ],
-      exports: [
-        {
-          provide: NEXT_GUARD_MODELS_TOKEN,
-          useValue: config.models,
-        },
-        NextGuard,
-        CheckModelAccessService,
-      ],
+      providers: [NextGuard, CheckModelAccessService],
+      exports: [NextGuard, CheckModelAccessService],
     };
   }
 }

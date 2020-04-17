@@ -1,6 +1,6 @@
 {
   "name": "@nextnm/nestjs-next-guard",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "NestJS RBAC Guard that also checks models ownership",
   "author": "Nuno Carvalhão <nuno.carvalhao@gmail.com>",
   "license": "MIT",
@@ -25,6 +25,7 @@
     "nestjs",
     "nextnm",
     "guard",
+    "ownership",
     "RBAC",
     "Mongoose"
   ],
@@ -44,9 +45,10 @@
   },
   "dependencies": {
     "@nestjs/mongoose": "^6.4.0",
-    "mongoose": "^5.9.7",
+    "@types/mongoose": "^5.7.10",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.5.5"
+    "rxjs": "^6.5.5",
+    "mongoose": "^5.9.7"
   },
   "devDependencies": {
     "@nestjs/common": "^7.0.7",
@@ -56,7 +58,6 @@
     "@types/express": "4.17.5",
     "@types/jest": "25.2.1",
     "@types/node": "13.11.1",
-    "@types/mongoose": "^5.7.9",
     "@types/supertest": "2.0.8",
     "jest": "25.3.0",
     "prettier": "2.0.4",

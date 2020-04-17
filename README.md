@@ -36,17 +36,16 @@ npm i @nextnm/nestjs-next-guard
 ## Usage
 
 ### Caveats
-
-1. You must be sure that in every request that the guard is used there is a user property in the request with an array of roles.
-2. It will only comtemplates situations where you a have an id as request param (GET ("/:id")) or in the body (PUT updating object {\_id:"...", "property1":....})
-   <!-- 1. npm i @nextnm/nestjs-next-guard -->
+1. We only support applications using mongodb.
+2. You must be sure that in every request that the guard is used there is a user property in the request with an array of roles.
+3. It will only contemplates situations where you a have an id as request param (GET ("/:id")) or in the body (PUT updating object {\_id:"...", "property1":....})
 
 ### Interface Decorator
 
 ```typescript
 export interface ICheckOwnerShip {
-  requestParam: string; // name of param that has the id mentioned in caveat 2
-  modelChain: string[]; // the chain of owernship between models
+  requestParam: string; // name of param that has the id mentioned in caveat 3
+  modelChain: string[]; // the chain of ownership between models
   propertyChain: string[]; // array of the properties that link the models
   godRole?: string; // the role that will overcome the verification
 }
@@ -57,19 +56,13 @@ export interface ICheckOwnerShip {
 ```typescript
 import * as mongoose from 'mongoose';
 import { NextGuardModule } from '@nextnm/nestjs-next-guard';
-// Temporary solution to pass connection to the guard
-mongoose.connect('<YOUR_CONNECTION_STRING>')
 
 ...
 @Module({
   imports: [
     DbModule,
     NextGuardModule.forRoot({
-      models: [
-        { token: 'Site', model: mongoose.model('site', SiteSchema)},
-        { token: 'Page', model: mongoose.model('page', PageSchema) },
-        { token: 'User', model: mongoose.model('user', UserSchema) },
-      ],
+      models: ['Site','Page', 'User'] // You need to provide to the module the Models that exist in your app
     }),
   ],
   controllers: [],
@@ -81,7 +74,7 @@ export class YOURModule {}
 
 ### Using decorators
 
-Be aware that both decorators are optional so use them as you want.
+Be aware that both decorators (Roles and CheckOwnerShip) are optional so use them as you want.
 
 #### 1. Use Case
 
@@ -103,14 +96,19 @@ Page:
   site:ObjectId
 }
 ```
-##### Description (A user belongs to an organization)
-1. The guard will look for an "Page" (modelChain[0]) by id equals to the request param;
-2. From the found Page it will try to grab the property 'site' (propertyChain[0]) and find a Site (modelChain[1]) by id equal to that property (propertyChain[0]).
-3. From the Site found it will check if the property "user" matches the id of the user making the request.
+##### Description (A user belongs to an Site)
+1. The guard will take a look if you have role based permission to use this route
+2. The guard will look for an "Page" (modelChain[0]) by id equals to the request param;
+3. From the found Page it will try to grab the property 'site' (propertyChain[0]) and find a Site (modelChain[1]) by id equal to that property (propertyChain[0]).
+4. From the Site found it will check if the property "user" matches the id of the user making the request.
 ```typescript
+  import { CheckOwnerShip, Roles } from '@nextnm/nestjs-next-guard';
+
+  ...
+
   @CheckOwnerShip({
     requestParam: 'modelId',
-    propertyChain: ['site', 'user'], // The last property will be compared wiht the Id of the user making the request
+    propertyChain: ['site', 'user'], // The last property will be compared with the Id of the user making the request
     modelChain: ['Page','Site'],
     godRole: ExistingRoles.SYS_ADMIN, // If the user has this role not check will be done by the guard
   })
@@ -139,14 +137,19 @@ Organization:
 ```
 
 ##### Description (A user belongs to an organization)
-1. The guard will look for an Organization (modelChain[0]) by id equals to the request param;
-2. From the found Organization it will try to grab the property '_id' (propertyChain[0]) and find a User (modelChain[1]) by id equal to the that property (propertyChain[0]).
-3. Since there isn't any, it will try to find a User with a property "organization" (propertyChain[1]) equals to the organization "_id" property(propertyChain[0])
-4. From the User found it will check if the property "_id" matches the id of the user making the request.
+1. The guard will take a look if you have role based permission to use this route
+2. The guard will look for an Organization (modelChain[0]) by id equals to the request param;
+3. From the found Organization it will try to grab the property '_id' (propertyChain[0]) and find a User (modelChain[1]) by id equal to the that property (propertyChain[0]).
+4. Since there isn't any, it will try to find a User with a property "organization" (propertyChain[1]) equals to the organization "_id" property(propertyChain[0])
+5. From the User found it will check if the property "_id" matches the id of the user making the request.
 ```typescript
+  import { CheckOwnerShip, Roles } from '@nextnm/nestjs-next-guard';
+
+    ...
+
     @CheckOwnerShip({
     requestParam: 'id',
-    propertyChain: ['_id','organization','_id'], // The last property will be compared wiht the Id of the user making the request
+    propertyChain: ['_id','organization','_id'], // The last property will be compared with the Id of the user making the request
     modelChain: ['Organization','User'],
     godRole: ExistingRoles.SYS_ADMIN, // If the user has this role not check will be done by the guard
   })
@@ -172,16 +175,16 @@ Contributions are welcome! See [Contributing](CONTRIBUTING.md).
 
 ## Next steps
 
-1. Add some tests using Jest and supertest
-2. Find a way to pass Mongoose Models to the module, to avoid calling "mongoose.connect(...)"
-3. Add support do many to many relatioships between models
+1. Improve documentation
+2. Add some tests using Jest and supertest
+3. Add support do many to many relationships between models
 4. Build Policy Based Guard
 
 <!-- See [Contributing](CONTRIBUTING.md). -->
 
 ## Author
 
-**Nuno Carvalhão (nextnm/nextNC)**
+**Nuno Carvalhão (nextnm/nextNC) [Site](https://nunocarvalhao.com)**
 
 ## License
 
