@@ -61,9 +61,7 @@ import { NextGuardModule } from '@nextnm/nestjs-next-guard';
 @Module({
   imports: [
     DbModule,
-    NextGuardModule.forRoot({
-      models: ['Site','Page', 'User'] // You need to provide to the module the Models that exist in your app
-    }),
+    NextGuardModule.forRoot(),
   ],
   controllers: [],
   providers: [],
