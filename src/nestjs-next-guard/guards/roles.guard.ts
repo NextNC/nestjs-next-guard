@@ -23,6 +23,7 @@ export class NextGuard implements CanActivate {
       context.getHandler(),
     );
     const request = context.switchToHttp().getRequest();
+    const isGod = () => user.roles.includes(checkOwnerShip.godRole);
 
     if (!roles && !checkOwnerShip) {
       return true;
@@ -42,16 +43,16 @@ export class NextGuard implements CanActivate {
       );
     }
 
+    if (isGod()) {
+      return true;
+    }
+
     if (checkOwnerShip) {
       const param =
         request.params[checkOwnerShip.requestParam] ||
         request.body[checkOwnerShip.requestParam];
 
-      if (
-        checkOwnerShip &&
-        checkOwnerShip.godRole &&
-        user.roles.indexOf(checkOwnerShip.godRole) === -1
-      ) {
+      if (checkOwnerShip && checkOwnerShip.godRole) {
         resultOwnerShip = await this.checkModelAccessService.checkAccess(
           param,
           [...checkOwnerShip.modelChain],
@@ -62,8 +63,11 @@ export class NextGuard implements CanActivate {
     }
 
     const hasRole = () => user.roles.some((role) => roles.includes(role));
+
     return (
       user && user.roles && (hasRole() || roles.length === 0) && resultOwnerShip
     );
   }
 }
+
+// ../../NestJS_Package/nestjs-package-starter/dist
