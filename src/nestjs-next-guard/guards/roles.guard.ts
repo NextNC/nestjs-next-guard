@@ -64,8 +64,6 @@ export class NextGuard implements CanActivate {
     }
 
     const hasRole = () => user.roles.some((role) => roles.includes(role));
-    console.log('resultOwnerShip',resultOwnerShip)
-
     return (
       user && user.roles && (hasRole() || roles.length === 0) && resultOwnerShip
     );
