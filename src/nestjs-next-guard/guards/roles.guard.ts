@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { CheckModelAccessService } from '../services/checkModelAccess.service';
 import { ICheckOwnerShip } from '../models/check-ownership';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class NextGuard implements CanActivate {
@@ -54,7 +55,7 @@ export class NextGuard implements CanActivate {
 
       if (checkOwnerShip && checkOwnerShip.godRole) {
         resultOwnerShip = await this.checkModelAccessService.checkAccess(
-          param,
+          [Types.ObjectId(param)],
           [...checkOwnerShip.modelChain],
           user._id,
           [...checkOwnerShip.propertyChain],
@@ -63,6 +64,7 @@ export class NextGuard implements CanActivate {
     }
 
     const hasRole = () => user.roles.some((role) => roles.includes(role));
+    console.log('resultOwnerShip',resultOwnerShip)
 
     return (
       user && user.roles && (hasRole() || roles.length === 0) && resultOwnerShip

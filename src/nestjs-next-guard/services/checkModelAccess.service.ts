@@ -8,7 +8,7 @@ export class CheckModelAccessService {
   constructor(private moduleRef: ModuleRef) {}
 
   public async checkAccess(
-    paramValue: any, // EX: site _id
+    paramValues: any[], // EX: site _id
     modelChain: string[],
     checkValue: any, // user _id  start
     propertyChain: string[] = [], // ['userId']
@@ -16,25 +16,27 @@ export class CheckModelAccessService {
     let paramKey = propertyChain.shift();
 
     for (const model of modelChain) {
-      let instance = await (this.getModel(model) as any)
-        .findById(paramValue)
+      let instances = await (this.getModel(model) as any)
+        .find({ _id: { $in: paramValues } })
         .lean();
 
-      if (!instance) {
+      if (!instances || instances.length === 0) {
         if (propertyChain.length === 0) {
           return false;
         }
-        instance = await (this.getModel(model) as any)
-          .findOne({ [paramKey]: Types.ObjectId(paramValue) })
+        instances = await (this.getModel(model) as any)
+          .find({ [paramKey]: { $in: paramValues } })
           .lean();
 
-        if (!instance) {
+        if (!instances || instances.length === 0) {
           return false;
         }
         paramKey = propertyChain.shift();
       } else {
-        paramValue = instance[paramKey];
-        if (!paramValue) {
+        paramValues = instances.map((instance) => {
+          return Types.ObjectId(instance[paramKey]);
+        });
+        if (!paramValues || paramValues.length === 0) {
           return false;
         }
       }
@@ -42,7 +44,10 @@ export class CheckModelAccessService {
       if (propertyChain.length > 0) {
         paramKey = propertyChain.shift();
       } else {
-        return Types.ObjectId(checkValue).equals(instance[paramKey]);
+        const matches = instances.filter((instance) =>
+          Types.ObjectId(checkValue).equals(instance[paramKey]),
+        );
+        return matches.length > 0;
       }
     }
   }
