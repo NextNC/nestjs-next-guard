@@ -175,7 +175,7 @@ Contributions are welcome! See [Contributing](CONTRIBUTING.md).
 
 1. Improve documentation
 2. Add some tests using Jest and supertest
-3. Add support do many to many relationships between models
+3. Add full support do many to many relationships between models (it doesn't alow having array of ids as relationships)
 4. Build Policy Based Guard
 
 <!-- See [Contributing](CONTRIBUTING.md). -->
