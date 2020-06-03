@@ -44,7 +44,7 @@ export class NextGuard implements CanActivate {
       );
     }
 
-    if (isGod()) {
+    if (checkOwnerShip && isGod()) {
       return true;
     }
 
