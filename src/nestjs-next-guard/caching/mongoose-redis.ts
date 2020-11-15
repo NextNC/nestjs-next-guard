@@ -52,9 +52,9 @@ export class MongooseRedis {
         ...this.getQuery(),
       });
 
-        console.time('Query redis');
+        // console.time('Query redis');
       const cacheValue = await client.hget(this.hashKey + '_NextGuard', key);
-        console.timeEnd('Query redis');
+        // console.timeEnd('Query redis');
 
       if (cacheValue) {
         const doc = JSON.parse((cacheValue as any) as string);
@@ -62,9 +62,9 @@ export class MongooseRedis {
           ? doc.map((d) => new this.model(d))
           : new this.model(doc);
       }
-        console.time('Query mongodb');
+        // console.time('Query mongodb');
       const result = await exec.apply(this, arguments);
-        console.timeEnd('Query mongodb');
+        // console.timeEnd('Query mongodb');
       client.hset(this.hashKey + '_NextGuard', key, JSON.stringify(result));
       (client as redis.RedisClient).expire(
         this.hashKey + '_NextGuard',
