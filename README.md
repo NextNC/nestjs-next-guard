@@ -69,6 +69,36 @@ import { NextGuardModule } from '@nextnm/nestjs-next-guard';
 })
 export class YOURModule {}
 ```
+### Importing module (Redis integration)
+We support Redis cache to improve performance when we have multiple chain nodes to verify ownership
+
+```typescript
+import * as mongoose from 'mongoose';
+import { NextGuardModule } from '@nextnm/nestjs-next-guard';
+
+...
+@Module({
+  imports: [
+    DbModule,
+    NextGuardModule.forRoot(
+      {
+        redisConfiguration: {
+          host: 'localhost',
+          port: 6379,
+          ttl: 60 * 60 * 24,
+          retry_strategy: () => 1000,
+          mongooseInstance: mongoose,
+        },
+      }
+    ),
+  ],
+  controllers: [],
+  providers: [],
+  exports: [NestjsNextGuardModule],
+})
+export class YOURModule {}
+```
+
 
 ### Using decorators
 

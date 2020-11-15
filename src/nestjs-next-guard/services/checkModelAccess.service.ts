@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { ModuleRef } from '@nestjs/core';
+import * as mongoose from 'mongoose'
 
 @Injectable()
 export class CheckModelAccessService {
@@ -16,17 +17,13 @@ export class CheckModelAccessService {
     let paramKey = propertyChain.shift();
 
     for (const model of modelChain) {
-      let instances = await (this.getModel(model) as any)
-        .find({ _id: { $in: paramValues } })
-        .lean();
+      let instances = await this.dbfind(model, paramValues, '_id');
 
       if (!instances || instances.length === 0) {
         if (propertyChain.length === 0) {
           return false;
         }
-        instances = await (this.getModel(model) as any)
-          .find({ [paramKey]: { $in: paramValues } })
-          .lean();
+        instances = await await this.dbfind(model, paramValues, paramKey);
 
         if (!instances || instances.length === 0) {
           return false;
@@ -51,6 +48,18 @@ export class CheckModelAccessService {
       }
     }
   }
+
+  dbfind(model: string, paramValues, paramKey) {
+    return (this.getModel(model) as any).find({ [paramKey]: { $in: paramValues } }).cache
+      ? (this.getModel(model) as any)
+          .find({ [paramKey]: { $in: paramValues } })
+          .cache({ cache: true })
+          .lean()
+      : (this.getModel(model) as any)
+          .find({ [paramKey]: { $in: paramValues } })
+          .lean();
+  }
+
   getModel(key: string) {
     try {
       const model = this.moduleRef.get(getModelToken(key), {

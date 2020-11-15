@@ -1,5 +1,11 @@
-import { Model } from 'mongoose';
 
 export interface ConfigurationNextGuard {
-  models: string[];
+  // models: string[];
+  redisConfiguration?: {
+    host: string;
+    port: number;
+    ttl: number;
+    retry_strategy: () => number;
+    mongooseInstance:any
+  };
 }
