@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { NEXT_GUARD_MODELS_TOKEN } from './nextGuard.config';
-import { ConfigurationNextGuard } from './configuration';
-import { NextGuard } from './guards/roles.guard';
-import { CheckModelAccessService } from './services/checkModelAccess.service';
 import { MongooseRedis } from './caching/mongoose-redis';
+import { NextGuard } from './guards/roles.guard';
+import { ConfigurationNextGuard } from './nextGuard.config';
+import { CheckModelAccessService } from './services/checkModelAccess.service';
+import { NEXT_GUARD_CONFIGURATION } from './tokens/tokens';
 
 @Module({})
 export class NextGuardModule {
@@ -14,7 +14,12 @@ export class NextGuardModule {
       //   controllers: [
       //     ...controllers,
       //   ],
-      providers: [NextGuard, CheckModelAccessService],
+      providers: [
+        { provide: NEXT_GUARD_CONFIGURATION, useValue: configuration },
+        // ,
+        NextGuard,
+        CheckModelAccessService,
+      ],
       exports: [NextGuard, CheckModelAccessService],
     };
   }

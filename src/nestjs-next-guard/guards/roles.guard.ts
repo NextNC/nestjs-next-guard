@@ -23,6 +23,11 @@ export class NextGuard implements CanActivate {
       'checkOwnerShip',
       context.getHandler(),
     );
+    if (checkOwnerShip && checkOwnerShip.redisCacheInvalidation) {
+      await this.checkModelAccessService.hdelete(
+        checkOwnerShip.redisCacheInvalidation.collection
+      );
+    }
     const request = context.switchToHttp().getRequest();
     const isGod = () => user.roles.includes(checkOwnerShip.godRole);
 

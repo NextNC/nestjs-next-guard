@@ -1,12 +1,30 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Types } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { ModuleRef } from '@nestjs/core';
-import * as mongoose from 'mongoose'
-
+import * as mongoose from 'mongoose';
+import { MongooseRedis } from '../caching/mongoose-redis';
+import { NEXT_GUARD_CONFIGURATION } from '../tokens/tokens';
 @Injectable()
 export class CheckModelAccessService {
-  constructor(private moduleRef: ModuleRef) {}
+  redisPlugin: any;
+
+  constructor(
+    private moduleRef: ModuleRef,
+    @Inject(NEXT_GUARD_CONFIGURATION) private readonly configuration,
+  ) {
+    this.redisPlugin = new MongooseRedis(this.configuration);
+  }
+
+  public async hdelete(collection: string) {
+    if (this.redisPlugin.isConnected) {
+      await this.redisPlugin.clearKey(`\"${collection}\"_NextGuard`);
+    }
+  }
 
   public async checkAccess(
     paramValues: any[], // EX: site _id
@@ -50,7 +68,9 @@ export class CheckModelAccessService {
   }
 
   dbfind(model: string, paramValues, paramKey) {
-    return (this.getModel(model) as any).find({ [paramKey]: { $in: paramValues } }).cache
+    return (this.getModel(model) as any).find({
+      [paramKey]: { $in: paramValues },
+    }).cache
       ? (this.getModel(model) as any)
           .find({ [paramKey]: { $in: paramValues } })
           .cache({ cache: true })

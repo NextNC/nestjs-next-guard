@@ -1,1 +1,10 @@
-export const NEXT_GUARD_MODELS_TOKEN = 'NEXT_GUARD_MODELS_CONFIG';
+export interface ConfigurationNextGuard {
+  // models: string[];
+  redisConfiguration?: {
+    host: string;
+    port: number;
+    ttl: number;
+    retry_strategy: () => number;
+    mongooseInstance: any;
+  };
+}

@@ -7,5 +7,6 @@ export const CheckOwnerShip = (config: ICheckOwnerShip) => {
     requestParam: config.requestParam,
     modelChain: config.modelChain,
     godRole: config.godRole,
+    redisCacheInvalidation: config.redisCacheInvalidation,
   });
 };

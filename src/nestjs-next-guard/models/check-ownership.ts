@@ -3,4 +3,7 @@ export interface ICheckOwnerShip {
   modelChain: string[];
   propertyChain: string[];
   godRole?: string;
+  redisCacheInvalidation?: {
+    collection: string;
+  };
 }
