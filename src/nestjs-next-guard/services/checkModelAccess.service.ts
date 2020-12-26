@@ -6,19 +6,13 @@ import {
 import { Types } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { ModuleRef } from '@nestjs/core';
-import * as mongoose from 'mongoose';
-import { MongooseRedis } from '../caching/mongoose-redis';
-import { NEXT_GUARD_CONFIGURATION } from '../tokens/tokens';
+import { REDIS_CLIENT } from '../tokens/tokens';
 @Injectable()
 export class CheckModelAccessService {
-  redisPlugin: any;
-
   constructor(
     private moduleRef: ModuleRef,
-    @Inject(NEXT_GUARD_CONFIGURATION) private readonly configuration,
-  ) {
-    this.redisPlugin = new MongooseRedis(this.configuration);
-  }
+    @Inject(REDIS_CLIENT) private readonly redisPlugin,
+  ) {}
 
   public async hdelete(collection: string) {
     if (this.redisPlugin.isConnected) {
