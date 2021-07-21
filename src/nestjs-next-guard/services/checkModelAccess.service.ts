@@ -42,9 +42,14 @@ export class CheckModelAccessService {
         }
         paramKey = propertyChain.shift();
       } else {
-        paramValues = instances.map((instance) => {
-          return Types.ObjectId(instance[paramKey]);
-        });
+        paramValues = instances
+          .map((instance) => {
+            if (Array.isArray(instance[paramKey])) {
+              return instance[paramKey].map((x) => Types.ObjectId(x));
+            }
+            return Types.ObjectId(instance[paramKey]);
+          })
+          .flat();
         if (!paramValues || paramValues.length === 0) {
           return false;
         }
@@ -53,9 +58,14 @@ export class CheckModelAccessService {
       if (propertyChain.length > 0) {
         paramKey = propertyChain.shift();
       } else {
-        const matches = instances.filter((instance) =>
-          Types.ObjectId(checkValue).equals(instance[paramKey]),
-        );
+        const matches = instances.filter((instance) => {
+          if (Array.isArray(checkValue)) {
+            return checkValue.find((x) =>
+              Types.ObjectId(x).equals(instance[paramKey]),
+            );
+          }
+          return Types.ObjectId(checkValue).equals(instance[paramKey]);
+        });
         return matches.length > 0;
       }
     }
