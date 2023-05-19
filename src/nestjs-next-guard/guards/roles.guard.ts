@@ -60,7 +60,7 @@ export class NextGuard implements CanActivate {
 
       if (checkOwnerShip && checkOwnerShip.godRole) {
         resultOwnerShip = await this.checkModelAccessService.checkAccess(
-          [Types.ObjectId(param)],
+          [new Types.ObjectId(param)],
           [...checkOwnerShip.modelChain],
           user._id,
           [...checkOwnerShip.propertyChain],

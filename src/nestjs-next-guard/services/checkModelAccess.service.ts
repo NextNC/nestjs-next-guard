@@ -45,9 +45,9 @@ export class CheckModelAccessService {
         paramValues = instances
           .map((instance) => {
             if (Array.isArray(instance[paramKey])) {
-              return instance[paramKey].map((x) => Types.ObjectId(x));
+              return instance[paramKey].map((x) => new Types.ObjectId(x));
             }
-            return Types.ObjectId(instance[paramKey]);
+            return new Types.ObjectId(instance[paramKey]);
           })
           .flat();
         if (!paramValues || paramValues.length === 0) {
@@ -61,10 +61,10 @@ export class CheckModelAccessService {
         const matches = instances.filter((instance) => {
           if (Array.isArray(checkValue)) {
             return checkValue.find((x) =>
-              Types.ObjectId(x).equals(instance[paramKey]),
+              new Types.ObjectId(x).equals(instance[paramKey]),
             );
           }
-          return Types.ObjectId(checkValue).equals(instance[paramKey]);
+          return new Types.ObjectId(checkValue).equals(instance[paramKey]);
         });
         return matches.length > 0;
       }

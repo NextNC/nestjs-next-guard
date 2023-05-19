@@ -1,8 +1,7 @@
 export interface ConfigurationNextGuard {
   // models: string[];
   redisConfiguration?: {
-    host: string;
-    port: number;
+    url: string,
     ttl: number;
     retry_strategy: () => number;
     mongooseInstance: any;

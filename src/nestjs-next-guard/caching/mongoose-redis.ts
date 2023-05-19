@@ -11,8 +11,7 @@ export class MongooseRedis {
     if (configuration && configuration.redisConfiguration) {
       this.mongoose = configuration.redisConfiguration.mongooseInstance;
       this.client = redis.createClient({
-        host: configuration.redisConfiguration.host,
-        port: configuration.redisConfiguration.port,
+        url: configuration.redisConfiguration.url,
         retry_strategy: configuration.redisConfiguration.retry_strategy,
       });
       this.setupPlugin();
