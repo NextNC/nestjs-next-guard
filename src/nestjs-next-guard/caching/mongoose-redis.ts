@@ -1,18 +1,21 @@
 import { Mongoose } from 'mongoose';
-import * as redis from 'redis';
-import * as util from 'util';
+import { createClient } from 'redis';
+
 import { ConfigurationNextGuard } from '../nextGuard.config';
+import { RedisClientType } from '@redis/client';
 
 export class MongooseRedis {
-  client: any;
+  client: RedisClientType;
   mongoose: any;
   isConnected = false;
   constructor(configuration?: ConfigurationNextGuard) {
     if (configuration && configuration.redisConfiguration) {
       this.mongoose = configuration.redisConfiguration.mongooseInstance;
-      this.client = redis.createClient({
+      this.client = createClient({
         url: configuration.redisConfiguration.url,
-        retry_strategy: configuration.redisConfiguration.retry_strategy,
+      });
+      this.client = createClient({
+        url: configuration.redisConfiguration.url,
       });
       this.setupPlugin();
     }
@@ -23,9 +26,8 @@ export class MongooseRedis {
   }
 
   private async setupPlugin(ttl = 60 * 60 * 24) {
-    const client: redis.RedisClient = this.client;
+    const client = this.client;
 
-    client.hget = util.promisify(this.client.hget);
     const exec = this.mongoose.Query.prototype.exec;
 
     (this.mongoose.Query.prototype as any).cache = function (
@@ -40,8 +42,8 @@ export class MongooseRedis {
       return this;
     };
 
-    await client.hset('test', 'connection', 'Ok');
-    const testQuery = await client.hget('test', 'connection');
+    await client.hSet('test', 'connection', 'Ok');
+    const testQuery = await client.hGet('test', 'connection');
     console.log('Connection Redis', testQuery);
     this.isConnected = true;
 
@@ -55,7 +57,7 @@ export class MongooseRedis {
       });
 
       // console.time('Query redis');
-      const cacheValue = await client.hget(
+      const cacheValue = await client.hGet(
         `\"${this.hashKey}\"_NextGuard`,
         key,
       );
@@ -70,11 +72,8 @@ export class MongooseRedis {
       // console.time('Query mongodb');
       const result = await exec.apply(this, arguments);
       // console.timeEnd('Query mongodb');
-      client.hset(`${this.hashKey}_NextGuard`, key, JSON.stringify(result));
-      (client as redis.RedisClient).expire(
-        `${this.hashKey}_NextGuard`,
-        this.time,
-      );
+      await (client as RedisClientType).hSet(`${this.hashKey}_NextGuard`, key, JSON.stringify(result));
+      await (client as RedisClientType).expire(`${this.hashKey}_NextGuard`, this.time);
       return result;
     };
   }
